@@ -75,7 +75,7 @@
                     }
                 }
             };
-            this.log = new MicrosoftExtensionsLog(new Mock<ILogger<ModbusModule>>().Object);
+            this.log = new MicrosoftExtensionsLog(new Mock<ILogger<ModbusModule>>().Object, new ModuleIdentify());
 
         }
 

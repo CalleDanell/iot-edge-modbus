@@ -22,7 +22,7 @@ namespace Modbus.Containers
         {
             var secondaryConfigFile = @"iot-edge-modbus.json";
 
-            // Wait until the app unloads or is cancelled by external triggers, use it for exceptional scnearios only.
+            // Wait until the app unloads or is cancelled by external triggers, use it for exceptional scenarios only.
             using (var cts = new CancellationTokenSource())
             {
                 // Wait until the app unloads or is cancelled
@@ -31,7 +31,6 @@ namespace Modbus.Containers
 
                 // Bootstrap services using dependency injection.
                 var services = new ServiceCollection();
-
 
                 Enum.TryParse<LogLevel>(Environment.GetEnvironmentVariable("ConsoleLogLevel"), out LogLevel consoleLogLevel);
 
@@ -52,8 +51,12 @@ namespace Modbus.Containers
                         builder.AddApplicationInsights(applicationInsightsKey);
                     });
                 }
-              
-                services.AddSingleton(sp => new MicrosoftExtensionsLog(sp.GetService<ILogger<ModbusModule>>()));
+
+                var moduleId = Environment.GetEnvironmentVariable("IOTEDGE_MODULEID");
+                var deviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
+
+                services.AddSingleton(sp => new MicrosoftExtensionsLog(sp.GetService<ILogger<ModbusModule>>(), 
+                    new ModuleIdentify { DeviceId = deviceId, ModuleId = moduleId }));
                 services.AddSingleton<IModuleClient, ModuleClientWrapper>();
                 services.AddSingleton<IEdgeModule, ModbusModule>();
                 services.AddSingleton<ISessionsHandle, SessionsHandle>();

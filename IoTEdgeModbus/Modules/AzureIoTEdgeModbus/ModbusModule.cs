@@ -59,7 +59,7 @@
             await this.startTask.ConfigureAwait(false);
             this.sessionsRun = true;
 
-            var config = this.DeviceConfiguration.DeserialiseDesiredProperties(JsonConvert.SerializeObject(desiredProperties));
+            var config = this.DeviceConfiguration.DeserializeDesiredProperties(JsonConvert.SerializeObject(desiredProperties));
 
             this.startTask = this.StartAsync(await ((SessionsHandle)userContext).CreateHandleFromConfiguration(config).ConfigureAwait(false), config.PublishInterval);
         }

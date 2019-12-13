@@ -6,6 +6,6 @@
     public interface IDeviceConfiguration<T>
     {
         Task<T> GetDeviceConfigurationAsync(CancellationToken cancellationToken);
-        T DeserialiseDesiredProperties(string desiredProperties);
+        T DeserializeDesiredProperties(string desiredProperties);
     }
 }

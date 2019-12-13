@@ -1,7 +1,6 @@
 ﻿namespace AzureIoTEdgeModbus.Configuration
 {
-    using AzureIoTEdgeModbus.Instrumentation;
-    using Microsoft.Extensions.Logging;
+    using Instrumentation;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Schema;
@@ -34,20 +33,20 @@
             try
             {
                 this.Log.RetrieveDesiredConfigurationFrom(this.GetType().Name);
-                return this.DeserialiseDesiredProperties(await this.GetConfigurationAsync(cancellationToken).ConfigureAwait(false));
+                return this.DeserializeDesiredProperties(await this.GetConfigurationAsync(cancellationToken).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
-                this.Log.ConfgurationRetrivalError(ex);
+                this.Log.ConfigurationRetrievalError(ex);
 
                 return this.Configuration == null ? throw new ConfigurationErrorsException("Could not find settings of the next configuration store.")
                     : await this.Configuration.GetDeviceConfigurationAsync(cancellationToken).ConfigureAwait(false);
             }
         }
 
-        public T DeserialiseDesiredProperties(string desiredProperties)
+        public T DeserializeDesiredProperties(string desiredProperties)
         {
-            // Validate Json configuration before deserialising.
+            // Validate Json configuration before deserializing.
             this.ValidateDeviceConfiguration(desiredProperties);
 
             return JsonConvert.DeserializeObject<T>(desiredProperties);
@@ -67,7 +66,7 @@
             {
                 foreach (var message in messages)
                 {
-                    this.Log.ConfgurationValidationError(message);
+                    this.Log.ConfigurationValidationError(message);
                 }
 
                 throw new ConfigurationErrorsException(string.Concat(messages));

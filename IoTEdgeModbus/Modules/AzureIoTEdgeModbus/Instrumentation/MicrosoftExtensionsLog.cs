@@ -15,10 +15,12 @@
     public class MicrosoftExtensionsLog : EventLog
     {
         private readonly ILogger logger;
+        private readonly ModuleIdentify moduleIdentify;
 
-        public MicrosoftExtensionsLog(ILogger logger)
+        public MicrosoftExtensionsLog(ILogger logger, ModuleIdentify moduleIdentify)
         {
             this.logger = logger;
+            this.moduleIdentify = moduleIdentify;
         }
 
         [Event(1000, Description = "Modbus sessions available: {sessionCount}")]
@@ -52,35 +54,35 @@
         }
 
         [Event(3000, Description = "Configuration received is invalid, JSON schema validation error: {errorMessage}.")]
-        public void ConfgurationValidationError(string errorMessage)
+        public void ConfigurationValidationError(string errorMessage)
         {
             this.LogWarning(MethodBase.GetCurrentMethod(), errorMessage);
         }
 
         [Event(4000, Description = "Could not retrieve desired properties from store.")]
-        public void ConfgurationRetrivalError(Exception exception)
+        public void ConfigurationRetrievalError(Exception exception)
         {
             this.LogError(MethodBase.GetCurrentMethod(), exception);
         }
 
         protected override void LogTrace(int id, string name, string description, params object[] args)
         {
-            this.logger.LogTrace(new EventId(id, name), description, args);
+            this.logger.LogTrace(new EventId(id, name), description, args, this.moduleIdentify);
         }
 
         protected override void LogInformation(int id, string name, string description, params object[] args)
         {
-            this.logger.LogInformation(new EventId(id, name), description, args);
+            this.logger.LogInformation(new EventId(id, name), description, args, this.moduleIdentify);
         }
 
         protected override void LogWarning(int id, string name, string description, params object[] args)
         {
-            this.logger.LogWarning(new EventId(id, name), description, args);
+            this.logger.LogWarning(new EventId(id, name), description, args, this.moduleIdentify);
         }
 
         protected override void LogError(int id, string name, Exception exception, string description, params object[] args)
         {
-            this.logger.LogError(new EventId(id, name), exception, description, args);
+            this.logger.LogError(new EventId(id, name), exception, description, args, this.moduleIdentify);
         }
     }
 }
