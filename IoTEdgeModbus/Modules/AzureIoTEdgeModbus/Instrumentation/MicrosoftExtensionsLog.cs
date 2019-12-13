@@ -3,6 +3,7 @@
     using Microsoft.Azure.Devices.Shared;
     using Microsoft.Extensions.Logging;
     using System;
+    using System.Collections.Generic;
     using System.Reflection;
 
     /// <summary>
@@ -15,9 +16,9 @@
     public class MicrosoftExtensionsLog : EventLog
     {
         private readonly ILogger logger;
-        private readonly ModuleIdentify moduleIdentify;
+        private readonly Dictionary<string,object> moduleIdentify;
 
-        public MicrosoftExtensionsLog(ILogger logger, ModuleIdentify moduleIdentify)
+        public MicrosoftExtensionsLog(ILogger logger, Dictionary<string, object> moduleIdentify)
         {
             this.logger = logger;
             this.moduleIdentify = moduleIdentify;
@@ -67,22 +68,22 @@
 
         protected override void LogTrace(int id, string name, string description, params object[] args)
         {
-            this.logger.LogTrace(new EventId(id, name), description, args, this.moduleIdentify);
+            this.logger.Log(LogLevel.Trace, new EventId(id, name), this.moduleIdentify, null, (object obj, Exception ex) => description);
         }
 
         protected override void LogInformation(int id, string name, string description, params object[] args)
         {
-            this.logger.LogInformation(new EventId(id, name), description, args, this.moduleIdentify);
+            this.logger.Log(LogLevel.Information, new EventId(id, name), this.moduleIdentify, null, (object obj, Exception ex) => description);
         }
 
         protected override void LogWarning(int id, string name, string description, params object[] args)
         {
-            this.logger.LogWarning(new EventId(id, name), description, args, this.moduleIdentify);
+            this.logger.Log(LogLevel.Information, new EventId(id, name), this.moduleIdentify, null, (object obj, Exception ex) => description);
         }
 
         protected override void LogError(int id, string name, Exception exception, string description, params object[] args)
         {
-            this.logger.LogError(new EventId(id, name), exception, description, args, this.moduleIdentify);
+            this.logger.Log(LogLevel.Error, new EventId(id, name), this.moduleIdentify, exception, (object obj, Exception ex) => description);
         }
     }
 }

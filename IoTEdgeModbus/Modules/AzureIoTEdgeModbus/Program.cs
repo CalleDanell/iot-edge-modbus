@@ -11,6 +11,7 @@ namespace Modbus.Containers
     using Microsoft.Extensions.Logging.ApplicationInsights;
     using Microsoft.Extensions.Logging.Console;
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Runtime.Loader;
     using System.Threading;
@@ -41,6 +42,7 @@ namespace Modbus.Containers
                 });
 
                 var applicationInsightsKey = Environment.GetEnvironmentVariable("ApplicationInsightsKey");
+
                 if (!string.IsNullOrEmpty(applicationInsightsKey))
                 {
                     Enum.TryParse<LogLevel>(Environment.GetEnvironmentVariable("ApplicationInsightsLogLevel"), out LogLevel applicationInsightsLogLevel);
@@ -52,11 +54,16 @@ namespace Modbus.Containers
                     });
                 }
 
-                var moduleId = Environment.GetEnvironmentVariable("IOTEDGE_MODULEID");
                 var deviceId = Environment.GetEnvironmentVariable("IOTEDGE_DEVICEID");
+                var moduleId = Environment.GetEnvironmentVariable("IOTEDGE_MODULEID");
+                
+                var additionalProperties = new Dictionary<string, object>
+                {
+                    { "DeviceId", deviceId },
+                    { "ModuleId", moduleId }
+                };
 
-                services.AddSingleton(sp => new MicrosoftExtensionsLog(sp.GetService<ILogger<ModbusModule>>(), 
-                    new ModuleIdentify { DeviceId = deviceId, ModuleId = moduleId }));
+                services.AddSingleton(sp => new MicrosoftExtensionsLog(sp.GetService<ILogger<ModbusModule>>(), additionalProperties));
                 services.AddSingleton<IModuleClient, ModuleClientWrapper>();
                 services.AddSingleton<IEdgeModule, ModbusModule>();
                 services.AddSingleton<ISessionsHandle, SessionsHandle>();
